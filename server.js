@@ -29,6 +29,8 @@ app.get("/", (req, res) => {
 
 // 업로드 처리
 app.post("/upload", upload.single("mp3"), (req, res) => {
+  if (!req.file) return res.status(400).send("파일 업로드 실패");
+
   // 기존 파일 삭제
   fs.readdirSync("uploads").forEach(f => fs.unlinkSync(path.join("uploads", f)));
 
@@ -38,9 +40,7 @@ app.post("/upload", upload.single("mp3"), (req, res) => {
   res.redirect("/");
 });
 
-// Render 환경에서 포트 설정
+// Render 환경 포트
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ 서버 실행: http://localhost:${PORT}`));
-import fs from "fs";
-if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
 
