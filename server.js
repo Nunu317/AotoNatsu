@@ -41,3 +41,6 @@ app.post("/upload", upload.single("mp3"), (req, res) => {
 // Render 환경에서 포트 설정
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ 서버 실행: http://localhost:${PORT}`));
+import fs from "fs";
+if (!fs.existsSync("uploads")) fs.mkdirSync("uploads");
+
