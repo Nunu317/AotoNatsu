@@ -4,15 +4,16 @@ import fs from "fs";
 import path from "path";
 
 const app = express();
-const upload = multer({ dest: "uploads/" });
 
-// uploads 폴더 없으면 자동 생성
-if (!fs.existsSync("uploads")) {
-  fs.mkdirSync("uploads");
-}
+// 수정된 multer 설정
+const upload = multer({ storage: multer.memoryStorage() });
 
 // 정적 파일 제공
 app.use("/uploads", express.static("uploads"));
+
+// uploads 폴더 자동 생성
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
 
 // 메인 페이지
 app.get("/", (req, res) => {
@@ -31,11 +32,8 @@ app.get("/", (req, res) => {
 app.post("/upload", upload.single("mp3"), (req, res) => {
   if (!req.file) return res.status(400).send("파일 업로드 실패");
 
-  // 기존 파일 삭제
-  fs.readdirSync("uploads").forEach(f => fs.unlinkSync(path.join("uploads", f)));
-
-  // 새 파일 저장
-  fs.renameSync(req.file.path, path.join("uploads", "song.mp3"));
+  // 파일 저장 (기존 덮어쓰기)
+  fs.writeFileSync(path.join(uploadDir, "song.mp3"), req.file.buffer);
 
   res.redirect("/");
 });
